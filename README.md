@@ -1,2 +1,2 @@
 # NonogramMaker
-Makes a nonogram when given a picture
+This application turns a picture into a nonogram: black and white or coloured.

@@ -15,15 +15,15 @@ def pixelize(img, maxSize = 80, toBW = False): #img is from PIL.Image
     newImg = img
     if toBW:
         newImg = newImg.convert("L")
-    newImg = newImg.resize((newWidth, newHeight), Image.ANTIALIAS)
+    newImg = newImg.resize((newWidth, newHeight), Image.LANCZOS)
     return newImg
 
-def changeColors(img, n=2):
+def changeColors(img, n=1):
     rgbImg = img.convert("RGB")
     width, height = rgbImg.size
     clrs = list(rgbImg.getdata())
     clrs = np.array(clrs)
-    kmeans = KMeans(n_clusters=n).fit(clrs)
+    kmeans = KMeans(n_clusters=n+1).fit(clrs)
     pixels = rgbImg.load()
     clusterNumbers = list(kmeans.labels_)
     colors = list(map(tuple,list(kmeans.cluster_centers_)))
@@ -44,7 +44,7 @@ if __name__ == "__main__":
                 img = Image.open(f)
                 newImg = pixelize(img)
                 newImg.save(f[:-4] + "Res."+ext)
-                altImg = changeColors(newImg, 8)
+                altImg = changeColors(newImg, 3)
                 altImg.save(f[:-4] + "Pix."+ext)
                 newImg = pixelize(img, toBW = True)
                 newImg.save(f[:-4] + "BWRes."+ext)

@@ -35,7 +35,7 @@ def getColors(img, n=1):
                     c1 = tuple(c1)
                     c2 = tuple(c2)
                     if not(c1==c2):
-                        similarity += 10000000 * int(max([abs(c1[i]-c2[i]) for i in range(3)]) <= 50)
+                        similarity += 10000 * int(max([abs(c1[i]-c2[i]) for i in range(3)]) <= 50)
             res.append((kmeans.score(clrs) - similarity)*(k+1))
         #print(res)
         #print(max(res))
@@ -47,9 +47,7 @@ def getColors(img, n=1):
     colors = list(map(lambda t: tuple(map(int,t)), colors))
     print(colors)
     if n==1:
-        def round255Tuple(t):
-            return (0,0,0) if t[0] < 255/2 else (255,255,255)
-        colors = list(map(lambda t: round255Tuple(t), colors))
+        colors = [(0,0,0),(255,255,255)] if colors[0][0] < colors[1][0] else [(255,255,255),(0,0,0)]
     return (clusterNumbers, colors)
 
 def changeColors(img, n=1):
@@ -67,16 +65,17 @@ def changeColors(img, n=1):
 #for testing purposes
 if __name__ == "__main__":
 
-    PICNUMCLRS = {"bwPic.png": 1, "cPic.png": 2, "Izzet.png": 3}
+    PICNUMCLRS = {"bwPic.png": 1, "cPic.png": 2, "Izzet.png": 3, "huatli.jpg": 10, "nahiri.jpg": ""}
 
     for f in PICNUMCLRS.keys():
         print(f[:-4])
+        currpath = "/Users/lyndonf/Desktop/NonogramMaker/TestPics/"
         if not ("Res" in f or "Pix" in f):
-            img = cv2.imread(f, cv2.IMREAD_UNCHANGED)
+            img = cv2.imread(currpath + f, cv2.IMREAD_UNCHANGED)
             newImg = pixelize(img)
-            cv2.imwrite("Res"+f, newImg)
+            cv2.imwrite(currpath + "Res"+f, newImg)
             altImg = changeColors(newImg, PICNUMCLRS[f])
-            cv2.imwrite("zPix"+f, altImg)
+            cv2.imwrite(currpath + "zPix"+f, altImg)
             if PICNUMCLRS[f]>1:
                 bwImg = changeColors(pixelize(img,toBW=True))
-                cv2.imwrite("zPix_BW"+f, bwImg)
+                cv2.imwrite(currpath + "zPix_BW"+f, bwImg)

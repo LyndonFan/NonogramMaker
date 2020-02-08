@@ -37,11 +37,33 @@ def getBackgroundColor(img):
         raise Exception, "There doesn't seem to be a suitable background color..."
     else:
         return candidateClrs[0]
-    
 
+def getClues(img, bgColor):
+    width = img.shape[1]
+    height = img.shape[0]
+    hRead = [[img[j,i] for i in range(width)] for j in range(height)]
+    vRead = [[img[j,i] for j in range(height)] for i in range(width)]
+    hRead = list(map(lambda r: list(filter(lambda x: not(x==bgColor), r)), hRead))
+    vRead = list(map(lambda c: list(filter(lambda x: not(x==bgColor), c)), vRead))
+    def groupColors(arr):
+        i = 1
+        res = []
+        count = 1
+        curr = arr[0]
+        while i < len(arr):
+            while i < len(arr) and arr[i]==curr:
+                i += 1
+                count += 1
+            res.append((curr, count))
+            if i < len(arr):
+                count = 0
+                curr = arr[i]
+        assert sum(list([ t[1] for t in res])) == len(arr), "We're missing a few elements here..."
+        return res
+    hClues = groupColors(hRead)
+    vClues = groupColors(vRead)
+    return (hClues, vClues)
 
-def toNonogram(img):
-    return
 
 if __name__ == "__main__":
 
@@ -61,3 +83,5 @@ if __name__ == "__main__":
         plt.show()
         '''
         print(getBackgroundColor(img))
+
+    

@@ -54,18 +54,23 @@ def changeColors(img, n=1):
     clusterNumbers, colors = getColors(img, n)
     width = img.shape[1]
     height = img.shape[0]
-    newImg = img
     print(colors, n)
+    assert not(type(n)==int) or len(colors) == n+1, "There are "+str(len(colors))+" but I wanted "+str(n+1)+"..."
     #pprint(["".join(list(map(str,clusterNumbers[k*width:(k+1)*width]))) for k in range(height)])
-    for i in range(width):
-        for j in range(height):
-            newImg[j,i] = colors[clusterNumbers[i+j*width]]
+    newImg = [colors[k] for k in clusterNumbers]
+    newImg = np.array(newImg)
+    newImg = newImg.reshape(height, width, len(colors[0]))
+    '''
+    #In case you want to preview the picture in your terminal...
+    if len(colors)<10:
+        print("\n".join(["".join(list(map(str,clusterNumbers[i*width:(i+1)*width]))) for i in range(height)]))
+    '''
     return newImg
 
 #for testing purposes
 if __name__ == "__main__":
 
-    PICNUMCLRS = {"bwPic.png": 1, "cPic.png": 2, "Izzet.png": 3, "huatli.jpg": 10, "nahiri.jpg": ""}
+    PICNUMCLRS = {"bwPic.png": 1, "cPic.png": 2, "Izzet.png": 3, "huatli.png": 10, "nahiri.png": ""}
 
     for f in PICNUMCLRS.keys():
         print(f[:-4])

@@ -65,12 +65,18 @@ def changeColors(img, n=1):
     if len(colors)<10:
         print("\n".join(["".join(list(map(str,clusterNumbers[i*width:(i+1)*width]))) for i in range(height)]))
     '''
+    #To see the colors
+    if len(colors)>2:
+        clrsImg = [[[x for asdf in range(100)] for x in colors] for qwer in range(100)]
+        clrsImg = np.array(clrsImg)
+        clrsImg = clrsImg.reshape(100, len(colors)*100, len(colors[0]))
+        cv2.imwrite(str(hash(colors[0]))+"_"+str(len(colors))+"Colors.png", clrsImg)
     return newImg
 
 #for testing purposes
 if __name__ == "__main__":
 
-    PICNUMCLRS = {"bwPic.png": 1, "cPic.png": 2, "Izzet.png": 3, "huatli.png": 10, "nahiri.png": ""}
+    PICNUMCLRS = {"bwPic.png": 1, "cPic.png": 2, "Izzet.png": 3, "huatli.png": "", "nahiri.png": "", "dino.png":""}
 
     for f in PICNUMCLRS.keys():
         print(f[:-4])

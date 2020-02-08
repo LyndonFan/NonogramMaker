@@ -70,12 +70,11 @@ if __name__ == "__main__":
     for f in PICNUMCLRS.keys():
         print(f[:-4])
         currpath = "/Users/lyndonf/Desktop/NonogramMaker/TestPics/"
-        if not ("Res" in f or "Pix" in f):
-            img = cv2.imread(currpath + f, cv2.IMREAD_UNCHANGED)
-            newImg = pixelize(img)
-            cv2.imwrite(currpath + "Res"+f, newImg)
-            altImg = changeColors(newImg, PICNUMCLRS[f])
-            cv2.imwrite(currpath + "zPix"+f, altImg)
-            if PICNUMCLRS[f]>1:
-                bwImg = changeColors(pixelize(img,toBW=True))
-                cv2.imwrite(currpath + "zPix_BW"+f, bwImg)
+        img = cv2.imread(currpath + f, cv2.IMREAD_UNCHANGED)
+        newImg = pixelize(img)
+        cv2.imwrite(currpath + "Res"+f, newImg)
+        altImg = changeColors(newImg, PICNUMCLRS[f])
+        cv2.imwrite(currpath + "zPix"+f, altImg)
+        if PICNUMCLRS[f]>1:
+            bwImg = changeColors(pixelize(img,toBW=True))
+            cv2.imwrite(currpath + "zPix_BW"+f, bwImg)

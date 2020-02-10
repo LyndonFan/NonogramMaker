@@ -6,15 +6,18 @@ import numpy as np
 import turtle
 
 def hashColor(c):
-    return sum([c[len(c)-1-p] * 1000**p for p in range(len(c))])
+    try:
+        return sum([c[p] * 1000**p for p in range(len(c))])
+    except:
+        return sum([c[p] * 1000**p for p in range(c.size())])
 
 def unhashColor(c):
     ans = c
     anstup = []
     while ans>=1000:
-        anstup.insert(0, ans%1000)
+        anstup.append(ans%1000)
         ans = ans//1000
-    anstup.insert(0, ans)
+    anstup.append(ans)
     anstup = tuple(anstup)
     return anstup
 
@@ -56,15 +59,22 @@ def getBackgroundColor(img):
 def getClues(img, bgColor):
     width = img.shape[1]
     height = img.shape[0]
-    hRead = [[img[j,i] for i in range(width)] for j in range(height)]
-    vRead = [[img[j,i] for j in range(height)] for i in range(width)]
-    def groupColors(arr):
-        for x in arr:
-            while str(bgColor) in list(map(str,x)):
-                x.pop(x.index(bgColor))
-        i = 1
+    hRead = [[list(img[j,i]) for i in range(width)] for j in range(height)]
+    vRead = [[list(img[j,i]) for j in range(height)] for i in range(width)]
+    #print(hRead[:5])
+    def groupColors(inp):
+        bgColorCount = 0
+        arr = list(map(hashColor,inp))
+        while hashColor(bgColor) in arr:
+            arr.pop(arr.index(hashColor(bgColor)))
+            bgColorCount += 1
+        arr = list(map(unhashColor,arr))
+        #print(arr)
+        i = 0
         res = []
-        count = 1
+        count = 0
+        if len(arr)==0:
+            return []
         curr = arr[0]
         while i < len(arr):
             while i < len(arr) and str(arr[i])==str(curr):
@@ -74,23 +84,53 @@ def getClues(img, bgColor):
             if i < len(arr):
                 count = 0
                 curr = arr[i]
-        assert sum(list([ t[1] for t in res])) == len(arr), "We're missing a few elements here..."
+        assert sum([t[1] for t in res]) + bgColorCount == len(inp), "We're missing a few elements here...\n" + str(res) + str(bgColorCount)
         return res
     hClues = list(map(groupColors,hRead))
     vClues = list(map(groupColors,vRead))
     return (hClues, vClues)
 
-def drawGrid(clues, gridShape, bgColor):
-    SQUARESIZE = 40
+def drawGrid(clues, gridShape, bgColor, SQUARESIZE = 40):
     hClues, vClues = clues
     maxHClues = max([len(r) for r in hClues])
     maxVClues = max([len(c) for c in vClues])
     width, height = gridShape
     img = np.full(((maxVClues+height)*SQUARESIZE + height + 1,(maxHClues+width)*SQUARESIZE + width + 1, len(bgColor)), 255)
-    if bgColor
-    img[maxVClues*SQUARESIZE:,maxHClues*SQUARESIZE:] = bgColor
-    img[:,[ maxHClues*SQUARESIZE + (SQUARESIZE+1)*k for k in range(width)]] = (0,0,0,0) if len(bgColor)==4 else (0,0,0)
-    img[[maxVClues*SQUARESIZE + (SQUARESIZE+1)*k for k in range(height)],:] = (0,0,0,0) if len(bgColor)==4 else (0,0,0)
+    if not(bgColor[0]+bgColor[1]+bgColor[2]==255*3):
+        img[maxVClues*SQUARESIZE:,maxHClues*SQUARESIZE:] = bgColor
+    img[:,[ maxHClues*SQUARESIZE + (SQUARESIZE+1)*k for k in range(width+1)]] = (0,0,0,0) if len(bgColor)==4 else (0,0,0)
+    img[[maxVClues*SQUARESIZE + (SQUARESIZE+1)*k for k in range(height+1)],:] = (0,0,0,0) if len(bgColor)==4 else (0,0,0)
+    return img
+
+def drawClues(img, clues, gridShape):
+    hClues, vClues = clues
+    maxHClues = max([len(r) for r in hClues])
+    maxVClues = max([len(c) for c in vClues])
+    width = img.shape[1]
+    height = img.shape[0]
+    SQUARESIZE = (width - gridShape[0] - 1) // (gridShape[0] + maxHClues)
+    assert (gridShape[1] + maxVClues) * SQUARESIZE + gridShape[1] + 1 == height, "SQUARESIZE isn't "+str(SQUARESIZE)
+    for i in range(len(hClues)):
+        startX = (maxHClues-len(hClues[i]))*SQUARESIZE
+        startY = (maxVClues+i)*SQUARESIZE+i+1
+        for j in range(len(hClues[i])):
+            clr = hClues[i][j][0]
+            compClr = tuple([(k+100)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255) 
+            xOffset = SQUARESIZE//3 if hClues[i][j][1]<10 else 0
+            img[startY:startY+SQUARESIZE, startX:startX+SQUARESIZE] = clr
+            cv2.putText(img,str(hClues[i][j][1]),(startX+xOffset,startY+4*SQUARESIZE//5),cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=compClr,thickness=2)
+            startX += SQUARESIZE
+    for i in range(len(vClues)):
+        startY = (maxVClues-len(vClues[i]))*SQUARESIZE
+        startX = (maxHClues+i)*SQUARESIZE+i+1
+        for j in range(len(vClues[i])):
+            clr = vClues[i][j][0]
+            compClr = tuple([(k+100)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255) 
+            #(clr,compClr)
+            xOffset = SQUARESIZE//3 if vClues[i][j][1]<10 else 0
+            img[startY:startY+SQUARESIZE, startX:startX+SQUARESIZE] = clr
+            cv2.putText(img,str(vClues[i][j][1]),(startX+xOffset,startY+4*SQUARESIZE//5),cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=compClr,thickness=2)
+            startY += SQUARESIZE
     return img
 
 
@@ -118,7 +158,8 @@ if __name__ == "__main__":
         res = getClues(img, bgColor)
         hClues, vClues = res
         print(max([len(x) for x in hClues]), max([len(x) for x in vClues]))
-        cv2.imwrite("Grid"+f, drawGrid(res,(width,height),bgColor))
+        img = drawGrid(res,(width,height),bgColor)
+        cv2.imwrite("Grid"+f, drawClues(np.float32(img), res, (width,height)))
 
 
     

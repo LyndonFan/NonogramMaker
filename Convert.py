@@ -3,7 +3,6 @@ from os import *
 from glob import *
 import matplotlib.pyplot as plt
 import numpy as np
-import turtle
 
 def hashColor(c):
     try:
@@ -44,7 +43,6 @@ def getBackgroundColor(img):
             except:
                 clrsMiddle[k] = int((i-width//2) < width//4 and (j-height//2) < height//4)
     candidateClrs = list(sorted(clrs.keys(), key = lambda c: clrs[c], reverse = True))
-    assert len(candidateClrs)<=11, "There are too many colors to begin with..."
     while len(candidateClrs)>0:
         h = candidateClrs[0]
         if clrs[h] >= img.size // 20 and clrsBoundary[h] >= 2*(width+height) // 10 and clrsMiddle[h] <= img.size // 4:

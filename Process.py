@@ -15,7 +15,13 @@ def pixelize(img, maxSize = 80, toBW = False): #img is from cv image
     newImg = img
     if toBW:
         newImg = cv2.cvtColor(cv2.cvtColor(newImg, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2RGB)
+    if newImg.shape[2]==3:
+        layer = np.repeat(255,height*width)
+        layer = layer.reshape((height,width,1))
+        print(newImg.shape,layer.shape)
+        newImg = np.concatenate((newImg,layer),axis=2)
     newImg = cv2.resize(newImg, dsize = (newWidth, newHeight), interpolation = cv2.INTER_NEAREST)
+    print(newImg.shape)
     return newImg
 
 def getColors(img, n=1):
@@ -76,7 +82,7 @@ def changeColors(img, n=1):
 #for testing purposes
 if __name__ == "__main__":
 
-    PICNUMCLRS = {"bwPic.png": 1, "cPic.png": 2, "Izzet.png": 3, "huatli.png": "", "nahiri.png": "", "dino.png":""}
+    PICNUMCLRS = {"bwPic.png": 1, "cPic.png": 2, "Izzet.png": 3, "huatli.png": "", "nahiri.png": ""}
 
     for f in PICNUMCLRS.keys():
         print(f[:-4])

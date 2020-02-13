@@ -88,11 +88,11 @@ def getClues(img, bgColor):
     vClues = list(map(groupColors,vRead))
     return (hClues, vClues)
 
-def drawGrid(clues, gridShape, bgColor, SQUARESIZE = 40):
+def drawGrid(clues, imgShape, bgColor, SQUARESIZE = 40):
     hClues, vClues = clues
     maxHClues = max([len(r) for r in hClues])
     maxVClues = max([len(c) for c in vClues])
-    width, height = gridShape
+    width, height = imgShape
     img = np.full(((maxVClues+height)*SQUARESIZE + height + 1,(maxHClues+width)*SQUARESIZE + width + 1, len(bgColor)), 255)
     if not(bgColor[0]+bgColor[1]+bgColor[2]==255*3):
         img[maxVClues*SQUARESIZE:,maxHClues*SQUARESIZE:] = bgColor
@@ -100,14 +100,14 @@ def drawGrid(clues, gridShape, bgColor, SQUARESIZE = 40):
     img[[maxVClues*SQUARESIZE + (SQUARESIZE+1)*k for k in range(height+1)],:] = (0,0,0,0) if len(bgColor)==4 else (0,0,0)
     return img
 
-def drawClues(img, clues, gridShape):
+def drawClues(img, clues, imgShape):
     hClues, vClues = clues
     maxHClues = max([len(r) for r in hClues])
     maxVClues = max([len(c) for c in vClues])
     width = img.shape[1]
     height = img.shape[0]
-    SQUARESIZE = (width - gridShape[0] - 1) // (gridShape[0] + maxHClues)
-    assert (gridShape[1] + maxVClues) * SQUARESIZE + gridShape[1] + 1 == height, "SQUARESIZE isn't "+str(SQUARESIZE)
+    SQUARESIZE = (width - imgShape[0] - 1) // (imgShape[0] + maxHClues)
+    assert (imgShape[1] + maxVClues) * SQUARESIZE + imgShape[1] + 1 == height, "SQUARESIZE isn't "+str(SQUARESIZE)
     for i in range(len(hClues)):
         startX = (maxHClues-len(hClues[i]))*SQUARESIZE
         startY = (maxVClues+i)*SQUARESIZE+i+1

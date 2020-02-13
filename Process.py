@@ -10,18 +10,19 @@ def pixelize(img, maxSize = 80, toBW = False): #img is from cv image
     width = img.shape[1]
     height = img.shape[0]
     #print(width, height, img.shape)    
-    newWidth = maxSize if width >= height else width * maxSize // height
-    newHeight = maxSize if height >= width else height * maxSize // width
+    newWidth = maxSize if width >= height else (width * maxSize) // height
+    newHeight = maxSize if height >= width else (height * maxSize) // width
     newImg = img
     if toBW:
+        print("Converting to black and white...")
         newImg = cv2.cvtColor(cv2.cvtColor(newImg, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2RGB)
     if newImg.shape[2]==3:
         layer = np.repeat(255,height*width)
-        layer = layer.reshape((height,width,1))
+        layer = layer.reshape((height,width,1)).astype("float32")
         print(newImg.shape,layer.shape)
         newImg = np.concatenate((newImg,layer),axis=2)
-    newImg = cv2.resize(newImg, dsize = (newWidth, newHeight), interpolation = cv2.INTER_NEAREST)
-    print(newImg.shape)
+    print("Resizing to ({},{})...".format(newWidth, newHeight))
+    newImg = cv2.resize(newImg, dsize = (newWidth, newHeight), interpolation = cv2.INTER_AREA)
     return newImg
 
 def getColors(img, n=1):
@@ -29,7 +30,7 @@ def getColors(img, n=1):
     height = img.shape[0]
     clrs = [img[i//width, i%width] for i in range(width*height)]
     clrs = np.array(clrs)
-    if not (type(n) == int):
+    if not (type(n) == int) or n==0:
         print("Using best value of n from 1 to 10...")
         res = []
         for k in range(11):
@@ -61,11 +62,11 @@ def changeColors(img, n=1):
     width = img.shape[1]
     height = img.shape[0]
     print(colors, n)
-    assert not(type(n)==int) or len(colors) == n+1, "There are "+str(len(colors))+" but I wanted "+str(n+1)+"..."
+    assert not(type(n)==int) or n==0 or len(colors) == n+1, "There are "+str(len(colors))+" but I wanted "+str(n+1)+"..."
     #pprint(["".join(list(map(str,clusterNumbers[k*width:(k+1)*width]))) for k in range(height)])
     newImg = [colors[k] for k in clusterNumbers]
     newImg = np.array(newImg)
-    newImg = newImg.reshape(height, width, len(colors[0]))
+    newImg = newImg.reshape(height, width, len(colors[0])).astype("float32")
     '''
     #In case you want to preview the picture in your terminal...
     if len(colors)<10:

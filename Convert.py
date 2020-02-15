@@ -4,6 +4,8 @@ from glob import *
 import matplotlib.pyplot as plt
 import numpy as np
 
+#TODO: Make sure clrs are all in BGRA form
+
 def hashColor(c):
     try:
         return sum([c[p] * 1000**p for p in range(len(c))])
@@ -13,10 +15,9 @@ def hashColor(c):
 def unhashColor(c):
     ans = c
     anstup = []
-    for i in range(3):
+    for i in range(4):
         anstup.append(ans%1000)
         ans = ans//1000
-    anstup.append(ans)
     anstup = tuple(anstup)
     return anstup
 
@@ -51,6 +52,9 @@ def getBackgroundColor(img):
     if len(candidateClrs)==0:
         raise Exception, "There doesn't seem to be a suitable background color..."
     else:
+        remainingClrs = list(map(unhashColor,clrs.keys()))
+        remainingClrs.pop(remainingClrs.index(unhashColor(candidateClrs[0])))
+        print("{} colors(BGRA): ".format(len(remainingClrs)) + ", ".join(str(x) for x in remainingClrs))
         print("Background color: " + str(unhashColor(candidateClrs[0])))
         return unhashColor(candidateClrs[0])
         
@@ -62,15 +66,10 @@ def getClues(img, bgColor):
     vRead = [[list(img[j,i]) for j in range(height)] for i in range(width)]
     #print(hRead[:5])
     def groupColors(inp):
-        bgColorCount = 0
-        arr = list(map(hashColor,inp))
-        while hashColor(bgColor) in arr:
-            arr.pop(arr.index(hashColor(bgColor)))
-            bgColorCount += 1
-        arr = list(map(unhashColor,arr))
+        arr = inp
         #print(arr)
         i = 0
-        res = []
+        clues = []
         count = 0
         if len(arr)==0:
             return []
@@ -79,14 +78,22 @@ def getClues(img, bgColor):
             while i < len(arr) and str(arr[i])==str(curr):
                 i += 1
                 count += 1
-            res.append((curr, count))
+            clues.append((curr, count))
             if i < len(arr):
                 count = 0
                 curr = arr[i]
-        assert sum([t[1] for t in res]) + bgColorCount == len(inp), "We're missing a few elements here...\n" + str(res) + str(bgColorCount)
+        assert sum([t[1] for t in clues]) == len(inp), "We aren't getting all the colors...\n" + str(clues) + str(len(inp))
+        
+        res = []
+        for x in clues:
+            if not(hashColor(x[0]) == hash(bgColor)):
+                res.append(x)
         return res
+    
     hClues = list(map(groupColors,hRead))
     vClues = list(map(groupColors,vRead))
+    print(hClues[:5])
+    print(vClues[:5])
     return (hClues, vClues)
 
 def drawGrid(clues, imgShape, bgColor, SQUARESIZE = 40):
@@ -94,9 +101,8 @@ def drawGrid(clues, imgShape, bgColor, SQUARESIZE = 40):
     maxHClues = max([len(r) for r in hClues])
     maxVClues = max([len(c) for c in vClues])
     width, height = imgShape
-    img = np.full(((maxVClues+height)*SQUARESIZE + height + 1,(maxHClues+width)*SQUARESIZE + width + 1, len(bgColor)), 255)
-    if not(bgColor[0]+bgColor[1]+bgColor[2]==255*3):
-        img[maxVClues*SQUARESIZE:,maxHClues*SQUARESIZE:] = bgColor
+    img = np.full(((maxVClues+height)*SQUARESIZE + height + 1,(maxHClues+width)*SQUARESIZE + width + 1, len(bgColor)), 254)
+    img[maxVClues*SQUARESIZE:,maxHClues*SQUARESIZE:] = bgColor
     img[:,[ maxHClues*SQUARESIZE + (SQUARESIZE+1)*k for k in range(width+1)]] = (0,0,0,0) if len(bgColor)==4 else (0,0,0)
     img[[maxVClues*SQUARESIZE + (SQUARESIZE+1)*k for k in range(height+1)],:] = (0,0,0,0) if len(bgColor)==4 else (0,0,0)
     return img
@@ -114,7 +120,8 @@ def drawClues(img, clues, imgShape):
         startY = (maxVClues+i)*SQUARESIZE+i+1
         for j in range(len(hClues[i])):
             clr = hClues[i][j][0]
-            compClr = tuple([(k+122)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255) 
+            compClr = tuple([(k+122)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255,255) 
+            print(clr,compClr)
             xOffset = SQUARESIZE//3 if hClues[i][j][1]<10 else 0
             img[startY:startY+SQUARESIZE, startX:startX+SQUARESIZE] = clr
             cv2.putText(img,str(hClues[i][j][1]),(startX+xOffset,startY+4*SQUARESIZE//5),cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=compClr,thickness=2)
@@ -124,7 +131,7 @@ def drawClues(img, clues, imgShape):
         startX = (maxHClues+i)*SQUARESIZE+i+1
         for j in range(len(vClues[i])):
             clr = vClues[i][j][0]
-            compClr = tuple([(k+100)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255) 
+            compClr = tuple([(k+100)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255,255) 
             #(clr,compClr)
             xOffset = SQUARESIZE//3 if vClues[i][j][1]<10 else 0
             img[startY:startY+SQUARESIZE, startX:startX+SQUARESIZE] = clr

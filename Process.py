@@ -61,7 +61,7 @@ def changeColors(img, n=1):
     clusterNumbers, colors = getColors(img, n)
     width = img.shape[1]
     height = img.shape[0]
-    print(str(n)+" colors: " + " ".join(str(x) for x in colors))
+    #print(str(n)+" colors (BGRA): " + ", ".join(str(x) for x in colors))
     assert not(type(n)==int) or n==0 or len(colors) == n+1, "There are "+str(len(colors))+" but I wanted "+str(n+1)+"..."
     #pprint(["".join(list(map(str,clusterNumbers[k*width:(k+1)*width]))) for k in range(height)])
     newImg = [colors[k] for k in clusterNumbers]

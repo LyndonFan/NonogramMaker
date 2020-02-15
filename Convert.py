@@ -13,7 +13,7 @@ def hashColor(c):
 def unhashColor(c):
     ans = c
     anstup = []
-    while ans>=1000:
+    for i in range(3):
         anstup.append(ans%1000)
         ans = ans//1000
     anstup.append(ans)
@@ -51,6 +51,7 @@ def getBackgroundColor(img):
     if len(candidateClrs)==0:
         raise Exception, "There doesn't seem to be a suitable background color..."
     else:
+        print (unhashColor(candidateClrs[0]))
         return unhashColor(candidateClrs[0])
         
 

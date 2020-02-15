@@ -19,7 +19,7 @@ def pixelize(img, maxSize = 80, toBW = False): #img is from cv image
     if newImg.shape[2]==3:
         layer = np.repeat(255,height*width)
         layer = layer.reshape((height,width,1)).astype("float32")
-        print(newImg.shape,layer.shape)
+        #print(newImg.shape,layer.shape)
         newImg = np.concatenate((newImg,layer),axis=2)
     print("Resizing to ({},{})...".format(newWidth, newHeight))
     newImg = cv2.resize(newImg, dsize = (newWidth, newHeight), interpolation = cv2.INTER_AREA)
@@ -52,7 +52,7 @@ def getColors(img, n=1):
     clusterNumbers = list(kmeans.labels_)
     colors = list(map(tuple,list(kmeans.cluster_centers_)))
     colors = list(map(lambda t: tuple(map(int,t)), colors))
-    print(colors)
+    #print(colors)
     if n==1:
         colors = [(0,0,0),(255,255,255)] if colors[0][0] < colors[1][0] else [(255,255,255),(0,0,0)]
     return (clusterNumbers, colors)
@@ -61,7 +61,7 @@ def changeColors(img, n=1):
     clusterNumbers, colors = getColors(img, n)
     width = img.shape[1]
     height = img.shape[0]
-    print(colors, n)
+    print(str(n)+" colors: " + " ".join(str(x) for x in colors))
     assert not(type(n)==int) or n==0 or len(colors) == n+1, "There are "+str(len(colors))+" but I wanted "+str(n+1)+"..."
     #pprint(["".join(list(map(str,clusterNumbers[k*width:(k+1)*width]))) for k in range(height)])
     newImg = [colors[k] for k in clusterNumbers]

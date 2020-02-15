@@ -51,7 +51,7 @@ def getBackgroundColor(img):
     if len(candidateClrs)==0:
         raise Exception, "There doesn't seem to be a suitable background color..."
     else:
-        print (unhashColor(candidateClrs[0]))
+        print("Background color: " + str(unhashColor(candidateClrs[0])))
         return unhashColor(candidateClrs[0])
         
 
@@ -114,7 +114,7 @@ def drawClues(img, clues, imgShape):
         startY = (maxVClues+i)*SQUARESIZE+i+1
         for j in range(len(hClues[i])):
             clr = hClues[i][j][0]
-            compClr = tuple([(k+100)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255) 
+            compClr = tuple([(k+122)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255) 
             xOffset = SQUARESIZE//3 if hClues[i][j][1]<10 else 0
             img[startY:startY+SQUARESIZE, startX:startX+SQUARESIZE] = clr
             cv2.putText(img,str(hClues[i][j][1]),(startX+xOffset,startY+4*SQUARESIZE//5),cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=compClr,thickness=2)

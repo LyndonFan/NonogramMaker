@@ -32,5 +32,5 @@ parser.add_argument("-b","--blackAndWhite",action="count",help="indicate the ima
 parser.add_argument("-n","--numColor","--numColour",nargs="?",type=int,default=0,help="positive integer to denote the number of colors that should appear in your nonogram IN ADDITION to your background color.\nA 0 or negative integer means the algorithm will choose this number for you. \n (default = 0)")
 parser.add_argument("-r","--getResult",nargs="?",type=bool,default=True,help="boolean to indicate whether you want the finished picture (default = True)")
 args = parser.parse_args()
-print(args)
+print("arguments: " + str(args))
 main(args.image[0], args.maxDim[0], bool(args.blackAndWhite), (1 if args.blackAndWhite else args.numColor), args.getResult)

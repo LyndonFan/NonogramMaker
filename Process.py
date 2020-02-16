@@ -15,7 +15,7 @@ def pixelize(img, maxSize = 80, toBW = False): #img is from cv image
     newImg = img
     if toBW:
         print("Converting to black and white...")
-        newImg = cv2.cvtColor(cv2.cvtColor(newImg, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2RGB)
+        newImg = cv2.cvtColor(cv2.cvtColor(newImg, cv2.COLOR_BGR2GRAY), cv2.COLOR_GRAY2BGR)
     if newImg.shape[2]==3:
         layer = np.repeat(255,height*width)
         layer = layer.reshape((height,width,1)).astype("float32")

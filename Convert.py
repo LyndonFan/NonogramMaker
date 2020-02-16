@@ -15,9 +15,10 @@ def hashColor(c):
 def unhashColor(c):
     ans = c
     anstup = []
-    for i in range(4):
+    for i in range(3):
         anstup.append(ans%1000)
         ans = ans//1000
+    anstup.append(255)
     anstup = tuple(anstup)
     return anstup
 
@@ -119,9 +120,9 @@ def drawClues(img, clues, imgShape):
         startX = (maxHClues-len(hClues[i]))*SQUARESIZE
         startY = (maxVClues+i)*SQUARESIZE+i+1
         for j in range(len(hClues[i])):
-            clr = hClues[i][j][0]
-            compClr = tuple([(k+122)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255,255) 
-            print(clr,compClr)
+            clr = hClues[i][j][0] + ([] if len(hClues[i][j][0])==4 else [255])
+            compClr = [(k+122)%255 for k in clr] if sum(clr[:3])>=30 else [255,255,255,255]
+            #print(clr,compClr)
             xOffset = SQUARESIZE//3 if hClues[i][j][1]<10 else 0
             img[startY:startY+SQUARESIZE, startX:startX+SQUARESIZE] = clr
             cv2.putText(img,str(hClues[i][j][1]),(startX+xOffset,startY+4*SQUARESIZE//5),cv2.FONT_HERSHEY_SIMPLEX,fontScale=1,color=compClr,thickness=2)
@@ -130,8 +131,8 @@ def drawClues(img, clues, imgShape):
         startY = (maxVClues-len(vClues[i]))*SQUARESIZE
         startX = (maxHClues+i)*SQUARESIZE+i+1
         for j in range(len(vClues[i])):
-            clr = vClues[i][j][0]
-            compClr = tuple([(k+100)%255 for k in clr]) if sum(clr[:3])>=30 else (255,255,255,255) 
+            clr = vClues[i][j][0] + ([] if len(vClues[i][j][0])==4 else [255])
+            compClr = [(k+100)%255 for k in clr] if sum(clr[:3])>=30 else [255,255,255,255] 
             #(clr,compClr)
             xOffset = SQUARESIZE//3 if vClues[i][j][1]<10 else 0
             img[startY:startY+SQUARESIZE, startX:startX+SQUARESIZE] = clr

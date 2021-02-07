@@ -55,7 +55,7 @@ def getBackgroundColor(img):
             break
         candidateClrs.pop(0)
     if len(candidateClrs)==0:
-        raise Exception, "There doesn't seem to be a suitable background color..."
+        raise Exception("There doesn't seem to be a suitable background color...")
     else:
         remainingClrs = list(map(unhashColor,clrs.keys()))
         remainingClrs.pop(remainingClrs.index(unhashColor(candidateClrs[0])))

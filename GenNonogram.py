@@ -57,7 +57,7 @@ if __name__ == "__main__":
         default=[20],
         nargs=1,
         type=int,
-        help="minimum no. of squares in any dimension in the nonogram (default = 20)",
+        help="minimum no. of squares in any dimension in the nonogram (default = 20). Takes priority over maxdim if in conflict.",
     )
     parser.add_argument(
         "-b",

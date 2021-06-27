@@ -6,12 +6,15 @@ from sklearn.cluster import *
 import numpy as np
 from pprint import *
 
-def pixelize(img, maxSize = 80, toBW = False): #img is from cv image
+def pixelize(img, maxSize = 80, minSize = 20, toBW = False): #img is from cv image
     width = img.shape[1]
     height = img.shape[0]
     #print(width, height, img.shape)    
     newWidth = maxSize if width >= height else (width * maxSize) // height
     newHeight = maxSize if height >= width else (height * maxSize) // width
+    if min(newWidth, newHeight) < minSize:
+        newWidth = minSize if width <= height else (width * minSize) // height
+        newHeight = minSize if height <= width else (height * minSize) // width
     newImg = img
     if toBW:
         print("Converting to black and white...")

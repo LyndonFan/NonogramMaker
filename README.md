@@ -16,6 +16,10 @@ This application turns a picture into a nonogram: black and white or coloured.
     show this help message and exit
   - `-d MAXDIM, --maxDim MAXDIM`:
     maximum no. of squares in any dimension in the nonogram (default = 80)
+  - `--minDim MINDIM`:
+    minimum no. of squares in any dimension in the nonogram (default = 20).
+    
+    Note if MAXDIM and MINDIM are in conflict (e.g. picture has dimensions 10x50, default max and min dims), then MINDIM will take priority (e.g. in this case the result will be 20x100).
   - `-b, --blackAndWhite`:
     indicate the image should be converted to black and white
   - `-n [NUMCOLOR], --numColor [NUMCOLOR], --numColour [NUMCOLOR]`:

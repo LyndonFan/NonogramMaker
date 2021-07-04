@@ -28,7 +28,9 @@ def pixelize(img, maxSize=80, minSize=20, toBW=False):  # img is from cv image
         newImg = np.delete(newImg, 3, axis=0)
     print("Resizing to ({},{})...".format(newWidth, newHeight))
     newImg = cv2.resize(
-        newImg, dsize=(newWidth, newHeight), interpolation=cv2.INTER_AREA
+        newImg,
+        dsize=(newWidth, newHeight),
+        interpolation=cv2.INTER_NEAREST,  # cv2.INTER_AREA
     )
     return newImg
 
@@ -48,7 +50,9 @@ def getColors(img, n=1):
                 c1 = color.rgb2lab(centers[i])
                 for j in range(i + 1, k + 1):
                     c2 = color.rgb2lab(centers[j])
-                    similarity += (color.deltaE_cie76(c1, c2) / 23) ** 2
+                    dist = color.deltaE_cie76(c1, c2)
+                    # similarity += (dist / 23) ** 2
+                    similarity += 10 ** 11 / ((dist / 2.3) ** 2)
             # https://en.wikipedia.org/wiki/Color_difference#CIE76
             # difference of 2.3 corresponds to just noticeable difference
             # so dist < 2.3 --> much more similar
@@ -58,6 +62,7 @@ def getColors(img, n=1):
         plt.show()
         improvements = [(res[i] - res[i + 1]) / res[i] for i in range(9)]
         n = 1
+        # pseudo-like elbow method: increases num colors until no sig improvement
         while n - 1 < len(improvements) and improvements[n - 1] >= 0.05:
             n += 1
         print(improvements)
@@ -88,18 +93,18 @@ def changeColors(img, n=1):
     newImg = [colors[k] for k in clusterNumbers]
     newImg = np.array(newImg)
     newImg = newImg.reshape(height, width, len(colors[0])).astype("float32")
-    """
-    #In case you want to preview the picture in your terminal...
-    if len(colors)<10:
-        print("\n".join(["".join(list(map(str,clusterNumbers[i*width:(i+1)*width]))) for i in range(height)]))
-    
-    #To see the colors
-    if len(colors)>2:
-        clrsImg = [[[x for asdf in range(100)] for x in colors] for qwer in range(100)]
-        clrsImg = np.array(clrsImg)
-        clrsImg = clrsImg.reshape(100, len(colors)*100, len(colors[0]))
-        cv2.imwrite(str(hash(colors[0]))+"_"+str(len(colors))+"Colors.png", clrsImg)
-    """
+
+    # # In case you want to preview the picture in your terminal...
+    # if len(colors)<10:
+    #     print("\n".join(["".join(list(map(str,clusterNumbers[i*width:(i+1)*width]))) for i in range(height)]))
+
+    # # To see the colors
+    # if len(colors)>2:
+    #     clrsImg = [[[x for asdf in range(100)] for x in colors] for qwer in range(100)]
+    #     clrsImg = np.array(clrsImg)
+    #     clrsImg = clrsImg.reshape(100, len(colors)*100, len(colors[0]))
+    #     cv2.imwrite(str(hash(colors[0]))+"_"+str(len(colors))+"Colors.png", clrsImg)
+
     return newImg
 
 
